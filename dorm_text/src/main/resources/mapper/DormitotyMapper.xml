@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sut.edu.zyp.dormitory.manage.mapper.DormitoryMapper">
+
+    <resultMap id="dormitoryResultMap" type="sut.edu.zyp.dormitory.manage.entity.DormitoryEntity">
+        <id property="id" column="id"/>
+        <result property="buildingId" column="building_id"/>
+        <result property="floor" column="floor"/>
+        <result property="maxNumber" column="max_number"/>
+        <result property="livedNumber" column="lived_number"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="sut.edu.zyp.dormitory.manage.entity.DormitoryEntity">
+        INSERT INTO dormitory(id, building_id, floor, max_number, lived_number)
+        VALUES(#{id}, #{buildingId}, #{floor}, #{maxNumber}, #{livedNumber})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM dormitory WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="sut.edu.zyp.dormitory.manage.entity.DormitoryEntity">
+        UPDATE dormitory
+        SET building_id=#{buildingId}, floor=#{floor},
+        max_number=#{maxNumber}, lived_number=#{livedNumber}
+        WHERE id=#{id}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="dormitoryResultMap">
+        SELECT * FROM dormitory WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="dormitoryResultMap">
+        SELECT * FROM dormitory
+    </select>
+
+    <select id="selectByBuildingId" parameterType="java.lang.String" resultMap="dormitoryResultMap">
+        SELECT * FROM dormitory WHERE building_id = #{buildingId}
+    </select>
+
+</mapper>

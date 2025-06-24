@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.fdzc.dorm_text.mapper.DormitoryManagerMapper">
+
+    <resultMap id="managerResultMap" type="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        INSERT INTO dormitory_manager(id, name, password, gender, phone)
+        VALUES(#{id}, #{name}, #{password}, #{gender}, #{phone})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM dormitory_manager WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        UPDATE dormitory_manager
+        SET name=#{name}, password=#{password},
+        gender=#{gender}, phone=#{phone}
+        WHERE id=#{id}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="managerResultMap">
+        SELECT * FROM dormitory_manager WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="managerResultMap">
+        SELECT * FROM dormitory_manager
+    </select>
+
+</mapper>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.fdzc.dorm_text.mapper.DormitoryManagerMapper">
+
+    <resultMap id="managerResultMap" type="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="gender" column="gender"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        INSERT INTO DormitoryManager(id, name, password, gender, phone)
+        VALUES(#{id}, #{name}, #{password}, #{gender}, #{phone})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM DormitoryManager WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="edu.fdzc.dorm_text.entity.DormitoryManagerEntity">
+        UPDATE DormitoryManager
+        SET name = #{name}, 
+            gender = #{gender}, 
+            phone = #{phone}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="managerResultMap">
+        SELECT * FROM DormitoryManager WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="managerResultMap">
+        SELECT * FROM DormitoryManager
+    </select>
+
+    <!-- 新增的宿管功能查询 -->
+
+    <!-- 查询宿管管理的宿舍信息 -->
+    <select id="selectManagedDormitory" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT 
+            d.id,
+            d.floor,
+            d.maxNumber,
+            d.livedNumber,
+            b.name as buildingName,
+            b.type as buildingType
+        FROM Dormitory d
+        LEFT JOIN Building b ON d.buildingId = b.id
+        WHERE d.dormitorymanagerId = #{managerId}
+    </select>
+
+    <!-- 查询宿舍的学生列表 -->
+    <select id="selectDormitoryStudents" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT 
+            s.id,
+            s.name,
+            s.gender,
+            s.department,
+            s.major,
+            s.grade,
+            s.class as clazz,
+            s.phone,
+            s.id_card,
+            l.checkInTime,
+            l.checkOutTime
+        FROM Student s
+        INNER JOIN Live l ON s.id = l.studentId
+        WHERE l.dormitoryId = #{dormitoryId} AND l.checkOutTime IS NULL
+        ORDER BY l.checkInTime DESC
+    </select>
+
+    <!-- 检查学生是否已经入住其他宿舍 -->
+    <select id="checkStudentAlreadyInDormitory" parameterType="java.lang.String" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM Live
+        WHERE studentId = #{studentId} AND checkOutTime IS NULL
+    </select>
+
+    <!-- 检查学生是否在指定宿舍 -->
+    <select id="checkStudentInDormitory" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM Live
+        WHERE studentId = #{studentId} AND dormitoryId = #{dormitoryId} AND checkOutTime IS NULL
+    </select>
+
+    <!-- 插入入住记录 -->
+    <insert id="insertLiveRecord">
+        INSERT INTO Live(studentId, dormitoryId, checkInTime)
+        VALUES(#{studentId}, #{dormitoryId}, #{checkInTime})
+    </insert>
+
+    <!-- 更新退宿记录 -->
+    <update id="updateLiveRecordCheckOut">
+        UPDATE Live
+        SET checkOutTime = #{checkOutTime}
+        WHERE studentId = #{studentId} AND dormitoryId = #{dormitoryId} AND checkOutTime IS NULL
+    </update>
+
+    <!-- 更新宿舍入住人数 -->
+    <update id="updateDormitoryLivedNumber">
+        UPDATE Dormitory
+        SET livedNumber = livedNumber + #{change}
+        WHERE id = #{dormitoryId}
+    </update>
+
+</mapper>

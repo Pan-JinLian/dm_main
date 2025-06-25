@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.fdzc.dorm_text.mapper.LiveMapper">
+
+    <resultMap id="LiveResultMap" type="edu.fdzc.dorm_text.entity.Live">
+        <result property="studentId" column="studentId" />
+        <result property="dormitoryId" column="dormitoryId" />
+        <result property="bed_id" column="bed_id" />
+        <result property="liveInDate" column="liveInDate" />
+        <result property="liveOutDate" column="liveOutDate" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <!-- 添加入住信息 -->
+    <insert id="addLive" parameterType="edu.fdzc.dorm_text.entity.Live">
+        INSERT INTO Live (
+            studentId, dormitoryId, bed_id,
+            liveInDate, liveOutDate, status
+        ) VALUES (
+                     #{studentId}, #{dormitoryId}, #{bed_id},
+                     #{liveInDate}, #{liveOutDate}, #{status}
+                 )
+    </insert>
+
+    <!-- 根据学生学号删除入住信息 -->
+    <delete id="deleteLiveByStudentId" parameterType="String">
+        DELETE FROM Live
+        WHERE studentId = #{studentId}
+    </delete>
+
+    <!-- 更新入住信息 -->
+    <update id="updateLive" parameterType="edu.fdzc.dorm_text.entity.Live">
+        UPDATE Live
+        SET
+            dormitoryId = #{dormitoryId},
+            bed_id = #{bed_id},
+            liveInDate = #{liveInDate},
+            liveOutDate = #{liveOutDate},
+            status = #{status}
+        WHERE studentId = #{studentId}
+    </update>
+
+    <!-- 根据学生学号查询入住信息 -->
+    <select id="getLiveByStudentId" parameterType="String" resultMap="LiveResultMap">
+        SELECT * FROM Live
+        WHERE studentId = #{studentId}
+    </select>
+
+    <!-- 查询所有入住信息 -->
+    <select id="getAllLives" resultMap="LiveResultMap">
+        SELECT * FROM Live
+    </select>
+
+    <!-- 查询所有入住信息（包含学生和宿舍信息） -->
+    <select id="getAllLivesWithDetails" resultType="java.util.Map">
+        SELECT 
+            l.studentId,
+            l.dormitoryId,
+            l.bed_id,
+            l.liveInDate,
+            l.liveOutDate,
+            l.status,
+            s.name as studentName,
+            d.id as dormitoryId,
+            d.floor as dormitoryFloor,
+            b.name as buildingName
+        FROM Live l
+        LEFT JOIN Student s ON l.studentId = s.id
+        LEFT JOIN Dormitory d ON l.dormitoryId = d.id
+        LEFT JOIN Building b ON d.buildingId = b.id
+    </select>
+
+</mapper>

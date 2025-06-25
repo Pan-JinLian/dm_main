@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.fdzc.dorm_text.mapper.DormitoryMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="dormitoryResultMap" type="edu.fdzc.dorm_text.entity.DormitoryEntity">
+        <id property="id" column="id"/>
+        <result property="dormitorymanagerId" column="dormitorymanagerId"/>
+        <result property="buildingId" column="buildingId"/>
+        <result property="floor" column="floor"/>
+        <result property="maxNumber" column="maxNumber"/>
+        <result property="livedNumber" column="livedNumber"/>
+    </resultMap>
+
+    <!-- DormitoryVo结果映射，包含关联信息 -->
+    <resultMap id="dormitoryVoResultMap" type="edu.fdzc.dorm_text.vo.DormitoryVo">
+        <id property="id" column="id"/>
+        <result property="buildingId" column="buildingId"/>
+        <result property="buildingName" column="buildingName"/>
+        <result property="dormitorymanagerId" column="dormitorymanagerId"/>
+        <result property="dormitoryManagerName" column="dormitoryManagerName"/>
+        <result property="floor" column="floor"/>
+        <result property="maxNumber" column="maxNumber"/>
+        <result property="livedNumber" column="livedNumber"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="edu.fdzc.dorm_text.entity.DormitoryEntity">
+        INSERT INTO Dormitory(id, dormitorymanagerId, buildingId, floor, maxNumber, livedNumber)
+        VALUES(#{id}, #{dormitorymanagerId}, #{buildingId}, #{floor}, #{maxNumber}, #{livedNumber})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM Dormitory WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="edu.fdzc.dorm_text.entity.DormitoryEntity">
+        UPDATE Dormitory
+        SET dormitorymanagerId=#{dormitorymanagerId},
+            buildingId=#{buildingId},
+            floor=#{floor},
+            maxNumber=#{maxNumber},
+            livedNumber=#{livedNumber}
+        WHERE id=#{id}
+    </update>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="dormitoryResultMap">
+        SELECT * FROM Dormitory WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="dormitoryResultMap">
+        SELECT * FROM Dormitory
+    </select>
+
+    <!-- 查询所有宿舍（包含楼栋和宿管信息） -->
+    <select id="selectAllWithDetails" resultMap="dormitoryVoResultMap">
+        SELECT 
+            d.id,
+            d.buildingId,
+            b.name as buildingName,
+            d.dormitorymanagerId,
+            dm.name as dormitoryManagerName,
+            d.floor,
+            d.maxNumber,
+            d.livedNumber
+        FROM Dormitory d
+        LEFT JOIN Building b ON d.buildingId = b.id
+        LEFT JOIN DormitoryManager dm ON d.dormitorymanagerId = dm.id
+    </select>
+
+    <select id="selectByBuildingId" parameterType="java.lang.String" resultMap="dormitoryResultMap">
+        SELECT * FROM Dormitory WHERE buildingId = #{buildingId}
+    </select>
+</mapper>

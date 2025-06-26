@@ -32,10 +32,12 @@ CREATE TABLE Building (
 -- 宿舍表
 CREATE TABLE Dormitory (
     id VARCHAR(20) PRIMARY KEY COMMENT '宿舍号',
+    dormitorymanagerId VARCHAR(20) NOT NULL COMMENT '所属宿管号',
     buildingId VARCHAR(10) NOT NULL COMMENT '所属楼号',
     floor VARCHAR(10) NOT NULL COMMENT '所属楼层',
     maxNumber INT NOT NULL COMMENT '最大可住人数',
     livedNumber INT DEFAULT 0 COMMENT '已住人数',
+    FOREIGN KEY (dormitorymanagerId) REFERENCES DormitoryManager(id) ON DELETE CASCADE,
     FOREIGN KEY (buildingId) REFERENCES Building(id) ON DELETE CASCADE
 ) COMMENT '宿舍信息表';
 
@@ -66,25 +68,26 @@ CREATE TABLE Live (
     FOREIGN KEY (dormitoryId) REFERENCES Dormitory(id) ON DELETE CASCADE
 ) COMMENT '学生入住信息表';
 
+-- 插入数据（密码不加密）
 INSERT INTO Admin (name, password) VALUES 
-('admin1', 'e10adc3949ba59abbe56e057f20f883e'), -- 密码: 123456
-('admin2', 'e10adc3949ba59abbe56e057f20f883e'); -- 密码: 123456
+('admin1', '123456'),
+('admin2', '123456');
 
 INSERT INTO DormitoryManager (id, name, password, gender, phone) VALUES 
-('DM001', '张管理员', 'e10adc3949ba59abbe56e057f20f883e', '男', '13800138001'),
-('DM002', '李管理员', 'e10adc3949ba59abbe56e057f20f883e', '女', '13800138002');
+('DM001', '张管理员', '123456', '男', '13800138001'),
+('DM002', '李管理员', '123456', '女', '13800138002');
 
 INSERT INTO Building (id, name, type, floors, rooms, dormitoryManagerId) VALUES 
 ('A01', '博雅楼', '男生', 6, 120, 'DM001'),
 ('B02', '文馨楼', '女生', 5, 100, 'DM002');
 
-INSERT INTO Dormitory (id, buildingId, floor, maxNumber, livedNumber) VALUES 
-('A01-101', 'A01', '1', 4, 2),
-('B02-201', 'B02', '2', 4, 1);
+INSERT INTO Dormitory (id, dormitorymanagerId, buildingId, floor, maxNumber, livedNumber) VALUES 
+('A01-101', 'DM001', 'A01', '1', 4, 2),
+('B02-201', 'DM002', 'B02', '2', 4, 1);
 
 INSERT INTO Student (id, name, id_card, password, gender, department, major, grade, class, phone) VALUES 
-('2023001', '张三', '110101200001011234', 'e10adc3949ba59abbe56e057f20f883e', '男', '计算机系', '软件工程', 2023, 1, '13800138003'),
-('2023002', '李四', '110101200002021235', 'e10adc3949ba59abbe56e057f20f883e', '女', '外语系', '英语', 2023, 2, '13800138004');
+('2023001', '张三', '110101200001011234', '123456', '男', '计算机系', '软件工程', 2023, 1, '13800138003'),
+('2023002', '李四', '110101200002021235', '123456', '女', '外语系', '英语', 2023, 2, '13800138004');
 
 INSERT INTO Live (studentId, dormitoryId, bed_id, liveInDate, liveOutDate, status) VALUES 
 ('2023001', 'A01-101', 'A01-101-1', '2023-09-01', NULL, 0),
